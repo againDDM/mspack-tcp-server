@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
 	"log"
@@ -12,28 +11,24 @@ import (
 func handleConnection(c net.Conn, workData *timeMap, deadline int64) {
 	defer c.Close()
 	client := c.RemoteAddr().String()
+	buf := make([]byte, 128)
 
-	scanner := bufio.NewScanner(c)
-	for {
-		if !scanner.Scan() {
-			if err := scanner.Err(); err != nil {
-				log.Printf("Error reading from %v :: %v \n", client, err)
-			}
-			break
-		}
-
-		err := c.SetDeadline(time.Now().Add(time.Duration(deadline)))
-		if err != nil {
-			log.Printf("Fail to set connection deadline %v :: %v \n", client, err)
-			break
-		}
-		notice, err := newNotice(scanner.Bytes())
-		if err != nil {
-			log.Printf("Wrong data from %v :: %v \n", client, err)
-			break
-		}
-		workData.add(notice)
+	err := c.SetDeadline(time.Now().Add(time.Duration(deadline) * time.Second))
+	if err != nil {
+		log.Printf("Fail to set connection deadline %v :: %v \n", client, err)
+		return
 	}
+	reqLen, err := c.Read(buf)
+	if err != nil {
+		log.Printf("Can`not read data from %v :: %v \n", client, err)
+		return
+	}
+	notice, err := newNotice(buf[:reqLen])
+	if err != nil {
+		log.Printf("Wrong data from %v :: %v \n", client, err)
+		return
+	}
+	workData.add(notice)
 }
 
 func main() {
