@@ -16,11 +16,7 @@ type Notice struct {
 }
 
 func newNotice(received []byte) (data *Notice, err error) {
-	err = msgpack.Unmarshal(received, &data)
-	//	if err != nil {
-	//		log.Fatalf("error: %v data: %v", err, received)
-	//	}
-	return data, err
+	return data, msgpack.Unmarshal(received, &data)
 }
 
 func (data *Notice) String() string           { return fmt.Sprintf("%s : %d", data.Domain, data.IP) }

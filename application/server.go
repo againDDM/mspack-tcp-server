@@ -11,7 +11,7 @@ import (
 func handleConnection(c net.Conn, workData *timeMap, deadline int64) {
 	defer c.Close()
 	client := c.RemoteAddr().String()
-	buf := make([]byte, 128)
+	buf := make([]byte, 1024)
 
 	err := c.SetDeadline(time.Now().Add(time.Duration(deadline) * time.Second))
 	if err != nil {
