@@ -73,6 +73,11 @@ def random_ip():
 
 
 class notice(object):
+    __slots__ = [
+        "domain",
+        "ip",
+        "ip_string",
+    ]
 
     def __init__(self):
         self.domain = random_domain()
